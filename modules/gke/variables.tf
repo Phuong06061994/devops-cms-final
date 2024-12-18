@@ -48,7 +48,7 @@ variable "disk_size_gb_cluster" {
 }
 variable "disk_size_gb" {
   type = number
-  default = 100
+  default = 50
 }
 variable "disk_type" {
   type = string

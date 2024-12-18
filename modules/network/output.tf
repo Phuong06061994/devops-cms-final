@@ -3,6 +3,11 @@ output "vpc_id" {
   value       = google_compute_network.vpc.id
 }
 
+output "vpc_name" {
+  description = "The ID of the VPC network"
+  value       = google_compute_network.vpc.name
+}
+
 output "public_subnets" {
   description = "Public subnets"
   value       = { for i, subnet in google_compute_subnetwork.public_subnet : i => subnet.ip_cidr_range }

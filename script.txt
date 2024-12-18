@@ -19,3 +19,20 @@ kubectl create namespace minio
 helm install minio minio/minio --namespace minio --set accessKey=admin --set secretKey=admin123 --set service.type=LoadBalancer
 kubectl get svc -n minio
 
+helm repo add apache-airflow https://airflow.apache.org
+helm repo update
+kubectl create namespace airflow
+helm install airflow apache-airflow/airflow --namespace airflow --create-namespace -f values.yaml
+
+helm install airflow apache-airflow/airflow --namespace airflow --create-namespace --set airflow.executor=CeleryExecutor --set postgresql.enabled=true --set redis.enabled=true  --set airflow.ingress.enabled=false
+
+helm upgrade --install airflow apache-airflow/airflow 
+  --namespace airflow 
+  --set airflow.image.tag="2.6.2" 
+  --set executor=CeleryExecutor 
+  --set airflow.config.AIRFLOW__CORE__LOAD_EXAMPLES=false 
+  --set redis.enabled=true 
+  --set postgresql.enabled=true 
+  --set airflow.ingress.enabled=true
+  --set webserver.service.type=ClusterIP
+

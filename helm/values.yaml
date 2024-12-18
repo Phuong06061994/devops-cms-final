@@ -1,0 +1,28 @@
+airflow:
+  executor: CeleryExecutor
+  service:
+    type: LoadBalancer
+
+  config:
+    AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+  data:
+    brokerUrl: "redis://10.45.62.27:6379/0"
+  connections:
+    - id: "postgres_default"
+      conn_type: "postgres"
+      host: "35.187.251.189"
+      schema: "mydatabase"
+      login: "myuser"
+      password: "mypassword"
+      port: "5432"
+
+    - id: "redis_default"
+      conn_type: "redis"
+      host: "10.45.62.27"
+      port: "6379"
+
+postgresql:
+  enabled: false
+
+redis:
+  enabled: false

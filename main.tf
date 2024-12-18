@@ -49,8 +49,20 @@ module "gke_cluster" {
   private_subnet_2  = module.network.private_subnets_name[0]
   node_pool_1_count = 1
   node_pool_2_count = 1
-  disk_size_gb = 10
   depends_on = [
     module.network.public_subnets
   ]
 }
+
+module "bucket" {
+  source = "./modules/bucket"
+  region = var.region
+}
+
+# module "database" {
+#   source = "./modules/database"
+#   region       = var.region
+#   project_id = var.project_id
+#   network_name = module.network.vpc_name
+#   private_subnet_1  = module.network.private_subnets_name[0]
+# }
