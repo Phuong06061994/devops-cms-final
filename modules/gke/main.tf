@@ -20,7 +20,7 @@ resource "google_compute_subnetwork" "custom" {
 
 resource "google_container_cluster" "primary" {
   name                     = var.cluster_name
-  location                 = var.region
+  location                 = "asia-southeast1-a"
   networking_mode          = "VPC_NATIVE"
   remove_default_node_pool = true
   initial_node_count       = 1
@@ -34,7 +34,7 @@ resource "google_container_cluster" "primary" {
   }
   node_config {
     machine_type = var.machine_type
-    disk_size_gb = var.disk_size_gb_cluster
+    disk_size_gb = var.disk_size_gb
     disk_type = "pd-standard"
   }
   enable_multi_networking = true
@@ -45,7 +45,7 @@ resource "google_container_cluster" "primary" {
 resource "google_container_node_pool" "primary_nodes_1" {
   name       = "nodepool-1"
   cluster    = google_container_cluster.primary.name
-  location   = var.region
+  location   = "asia-southeast1-a"
   node_count = var.node_pool_1_count
 
   node_config {
@@ -53,8 +53,8 @@ resource "google_container_node_pool" "primary_nodes_1" {
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform"
     ]
-    disk_size_gb = var.disk_size_gb
-    disk_type = var.disk_type
+    # disk_size_gb = var.disk_size_gb
+    # disk_type = var.disk_type
   }
 
   depends_on = [google_container_cluster.primary]

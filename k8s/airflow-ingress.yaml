@@ -8,7 +8,7 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-  - host: 35.240.191.196.nip.io   # Replace with your domain or external IP
+  - host: 34.143.168.185.nip.io   # Replace with your domain or external IP
     http:
       paths:
       - path: /
