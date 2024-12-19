@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cs-fuse-demo-app
+  namespace: airflow
+  annotations:
+    iam.gke.io/gcp-service-account: storage-admin@gothic-avenue-444923-e9.iam.gserviceaccount.com
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: cs-fuse-demo-app
+  name: cs-fuse-demo-app
+  namespace: airflow
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cs-fuse-demo-app
+  template:
+    metadata:
+      labels:
+        app: cs-fuse-demo-app
+      annotations:
+        gke-gcsfuse/volumes: "true" #Required
+        #Optional resource configuration for the sidecar container. Allocate more CPU to the sidecar container if your workloads need higher throughput.
+        gke-gcsfuse/cpu-limit: 500m
+        gke-gcsfuse/memory-limit: 100Mi
+        gke-gcsfuse/ephemeral-storage-limit: 5Gi   
+    spec:
+      serviceAccountName: cs-fuse-demo-app
+      securityContext:
+        runAsUser: 1001
+        runAsGroup: 2002
+        fsGroup: 3003
+      volumes:
+      - name: airflow-pv
+        persistentVolumeClaim:
+          claimName: airflow-pvc
+      containers:
+      - image: busybox
+        name: busybox
+        command: ["sleep"]
+        args: ["infinity"]
+        volumeMounts:
+        - name: airflow-pv
+          mountPath: /data
+          readOnly: true

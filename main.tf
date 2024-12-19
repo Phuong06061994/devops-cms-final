@@ -30,6 +30,7 @@ resource "google_project_service" "required_apis" {
 module "network" {
   source               = "./modules/network"
   region               = var.region
+  project_id = var.project_id
   network_name         = var.network_name
   public_subnet_cidrs  = var.public_subnet_cidrs
   private_subnet_cidrs = var.private_subnet_cidrs
@@ -43,6 +44,7 @@ module "gke_cluster" {
   cluster_name = "devops-gke-cluster-02"
   region       = var.region
   network_name = module.network.vpc_id
+  project_id = var.project_id
   # cluster_secondary_range_name = "gke-secondary-range"
   # services_secondary_range_name = "gke-services-secondary-range"
   private_subnet_1  = module.network.private_subnets_name[1]

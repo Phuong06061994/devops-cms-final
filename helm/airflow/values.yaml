@@ -1,0 +1,65 @@
+airflow:
+  image:
+    tag: "2.6.2"
+
+  executor: CeleryExecutor
+
+  config:
+    AIRFLOW__CORE__LOAD_EXAMPLES: false
+
+  ingress:
+    enabled: true
+
+  webserver:
+    service:
+      type: ClusterIP
+
+  dags:
+    persistence:
+      enabled: true
+      existingClaim: airflow-pvc
+      size: 100Gi
+
+redis:
+  enabled: true
+
+postgresql:
+  enabled: true
+
+logs:
+  persistence:
+    enabled: true
+    existingClaim: airflow-pvc
+    size: 100Gi
+
+workers:
+  replicas: 1
+
+scheduler:
+  replicas: 1
+
+flower:
+  enabled: true
+
+resources:
+  requests:
+    cpu: "500m"
+    memory: "512Mi"
+  limits:
+    cpu: "1000m"
+    memory: "1024Mi"
+
+securityContext:
+  runAsUser: 50000
+  fsGroup: 50000
+
+airflowPodAnnotations:
+  cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+
+statefulset:
+  triggerer:
+    updateStrategy:
+      type: RollingUpdate
+  worker:
+    updateStrategy:
+      type: RollingUpdate

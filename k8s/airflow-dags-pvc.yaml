@@ -1,13 +1,12 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: gcs-pvc
+  name: airflow-pvc
   namespace: airflow
 spec:
   accessModes:
     - ReadWriteMany
   resources:
     requests:
-      storage: 10Gi
-  volumeName: gcs-pv
-  storageClassName: gcs-storage  # Must match the PV's value
+      storage: 500Gi
+  storageClassName: gcs-storage

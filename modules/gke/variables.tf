@@ -62,3 +62,7 @@ variable "zone" {
   type        = string
   default     = "asia-southeast1-a"
 }
+variable "project_id" {
+  description = "The GCP project ID"
+  type        = string
+}

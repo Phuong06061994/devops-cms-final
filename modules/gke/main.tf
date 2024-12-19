@@ -32,10 +32,24 @@ resource "google_container_cluster" "primary" {
     services_secondary_range_name = google_compute_subnetwork.custom.secondary_ip_range.0.range_name
 
   }
+  workload_identity_config {
+    workload_pool = "${var.project_id}.svc.id.goog"
+  }
+  addons_config {
+    gce_persistent_disk_csi_driver_config {
+      enabled = true
+    }
+    gcs_fuse_csi_driver_config {
+      enabled = true
+    }
+    gcp_filestore_csi_driver_config {
+      enabled = true
+    }
+  }
   node_config {
     machine_type = var.machine_type
     disk_size_gb = var.disk_size_gb
-    disk_type = "pd-standard"
+    disk_type    = "pd-standard"
   }
   enable_multi_networking = true
   datapath_provider       = "ADVANCED_DATAPATH"

@@ -1,7 +1,6 @@
 variable "project_id" {
   description = "The GCP project ID"
   type        = string
-  default = "charged-magnet-443300-q4"
 }
 
 variable "region" {
