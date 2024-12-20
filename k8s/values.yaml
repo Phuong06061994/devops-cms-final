@@ -1,17 +1,5 @@
-airflow:
-  image:
-    tag: "2.6.2"
 
-  executor: CeleryExecutor
-  config:
-    AIRFLOW__CORE__LOAD_EXAMPLES: false
 
-dags:
-  mountPath: /opt/airflow/dags
-  persistence:
-    enabled: true
-    existingClaim: dags-pvc
-    size: 100Gi
 ingress:
     enabled: true
 
@@ -24,7 +12,7 @@ webserver:
     create: true
     name: phuongnv63
     annotations:
-      iam.gke.io/gcp-service-account: storage-admin@devops-cms-demo-445215.iam.gserviceaccount.com
+      iam.gke.io/gcp-service-account: storage-admin@gothic-avenue-444923-e9.iam.gserviceaccount.com
 redis:
   enabled: true
 
@@ -38,8 +26,7 @@ workers:
     create: false
     name: phuongnv63
     annotations:
-      iam.gke.io/gcp-service-account: storage-admin@devops-cms-demo-445215.iam.gserviceaccount.com
-
+      iam.gke.io/gcp-service-account: storage-admin@gothic-avenue-444923-e9.iam.gserviceaccount.com
 scheduler:
   replicas: 1
   serviceAccount:
@@ -47,7 +34,7 @@ scheduler:
     create: false
     name: phuongnv63
     annotations:
-      iam.gke.io/gcp-service-account: storage-admin@devops-cms-demo-445215.iam.gserviceaccount.com
+      iam.gke.io/gcp-service-account: storage-admin@gothic-avenue-444923-e9.iam.gserviceaccount.com
 flower:
   enabled: true
 
@@ -57,7 +44,7 @@ triggerer:
     create: false
     name: phuongnv63
     annotations:
-      iam.gke.io/gcp-service-account: storage-admin@devops-cms-demo-445215.iam.gserviceaccount.com
+      iam.gke.io/gcp-service-account: storage-admin@gothic-avenue-444923-e9.iam.gserviceaccount.com
   
 resources:
   requests:
@@ -69,8 +56,8 @@ resources:
 
 logs:
     persistence:
-      enabled: true
-      existingClaim: logs-pvc
+      enabled: false
+      existingClaim: airflow-pvc
       size: 100Gi
 
 securityContext:

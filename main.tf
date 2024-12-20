@@ -15,17 +15,17 @@ provider "google" {
 
 
 # Enable Required APIs
-resource "google_project_service" "required_apis" {
-  for_each = toset([
-    "compute.googleapis.com",   # Required for VPC and Subnet
-    "container.googleapis.com", # Required for GKE
-    "iam.googleapis.com"        # Required for Service Accounts
-  ])
-  project = var.project_id
-  service = each.key
+# resource "google_project_service" "required_apis" {
+#   for_each = toset([
+#     "compute.googleapis.com",   # Required for VPC and Subnet
+#     "container.googleapis.com", # Required for GKE
+#     "iam.googleapis.com"        # Required for Service Accounts
+#   ])
+#   project = var.project_id
+#   service = each.key
 
-  disable_on_destroy = false # Prevent disabling services
-}
+#   disable_on_destroy = false # Prevent disabling services
+# }
 
 module "network" {
   source               = "./modules/network"

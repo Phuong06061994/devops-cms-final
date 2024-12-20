@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: logs-pv
+spec:
+  capacity:
+    storage: 500Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: gcs-storage  # Use the correct StorageClass or set to "" if unused
+  csi:
+    driver: gcsfuse.csi.storage.gke.io
+    volumeHandle: phuongnv63
+    nodeStageSecretRef:
+      name: gcs-secret-airflow
+      namespace: airflow

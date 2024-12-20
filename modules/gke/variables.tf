@@ -42,13 +42,10 @@ variable "node_pool_2_count" {
   default     = 1
 }
 
-variable "disk_size_gb_cluster" {
-  type = number
-  default = 100
-}
+
 variable "disk_size_gb" {
   type = number
-  default = 250
+  default = 200
 }
 variable "disk_type" {
   type = string
