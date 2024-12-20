@@ -1,6 +1,7 @@
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
+
 helm install ingress-nginx ingress-nginx/ingress-nginx   --namespace ingress   --create-namespace   --set controller.service.type=LoadBalancer   --set controller.service.externalTrafficPolicy=Local
 
 helm install grafana prometheus-community/kube-prometheus-stack   --namespace monitoring   --create-namespace   --set forceCreateNamespace=true   -f grafana.yml
@@ -22,123 +23,32 @@ kubectl get svc -n minio
 helm repo add apache-airflow https://airflow.apache.org
 helm repo update
 kubectl create namespace airflow
+helm install airflow apache-airflow/airflow --namespace airflow --create-namespace -f values.yaml
 
-helm upgrade airflow apache-airflow/airflow 
-  --namespace airflow
-  --create-namespace
-  --set airflow.image.tag="2.6.2" 
+helm install airflow apache-airflow/airflow --namespace airflow --create-namespace --set airflow.executor=CeleryExecutor --set postgresql.enabled=true --set redis.enabled=true  --set airflow.ingress.enabled=false
+
+helm upgrade --install airflow-dev apache-airflow/airflow 
+--namespace airflow --create-namespace 
+--set dags.persistence.enabled=true 
+--set dags.persistence.existingClaim=logs-pvc 
+--set airflow.image.tag="2.6.2" -f ./helm/airflow/values.yaml
+
+
+
+
   --set executor=CeleryExecutor 
   --set airflow.config.AIRFLOW__CORE__LOAD_EXAMPLES=false 
   --set redis.enabled=true 
   --set postgresql.enabled=true 
   --set airflow.ingress.enabled=true
   --set webserver.service.type=ClusterIP
-  --set dags.persistence.enabled=true 
-  --set dags.persistence.existingClaim=airflow-pvc 
-  --set dags.persistence.size=500Gi
+
+gcloud projects add-iam-policy-binding gothic-avenue-444923-e9 --member "serviceAccount:gcs-csi-sa@gothic-avenue-444923-e9.iam.gserviceaccount.com" --role "roles/storage.admin"
+
+gcloud iam service-accounts keys create key.json --iam-account gcs-csi-sa@gothic-avenue-444923-e9.iam.gserviceaccount.com
 kubectl create secret generic gcs-secret --from-file=key.json --namespace airflow --create-namespace
 
+kubectl apply -k "github.com/kubernetes-sigs/gcp-filestore-csi-driver/deploy/kubernetes/overlays/stable"
 
-gcloud container clusters update devops-gke-cluster-02 --region asia-southeast1 --update-addons=GcePersistentDiskCsiDriver=ENABLED
-
-gcloud projects add-iam-policy-binding gothic-avenue-444923-e9 --member="serviceAccount:gcs-csi-sa@gothic-avenue-444923-e9.iam.gserviceaccount.com" --role="roles/storage.admin"
-
-
-
-helm install airflow apache-airflow/airflow 
-  --namespace airflow 
-  --create-namespace 
-  --set airflow.image.tag="2.6.2" 
-  --set executor=CeleryExecutor 
-  --set airflow.config.AIRFLOW__CORE__LOAD_EXAMPLES=false 
-  --set redis.enabled=true 
-  --set postgresql.enabled=true 
-  --set airflow.ingress.enabled=true 
-  --set webserver.service.type=ClusterIP 
-  --set dags.persistence.enabled=true 
-  --set dags.persistence.existingClaim=airflow-pvc 
-  --set dags.persistence.size=500Gi
-
-
-helm upgrade airflow apache-airflow/airflow 
-  --namespace airflow 
-  --create-namespace 
-  --set airflow.image.tag="2.6.2" 
-  --set executor=CeleryExecutor 
-  --set airflow.config.AIRFLOW__CORE__LOAD_EXAMPLES=false 
-  --set redis.enabled=true 
-  --set postgresql.enabled=true 
-  --set airflow.ingress.enabled=true 
-  --set webserver.service.type=ClusterIP 
-  --set dags.persistence.enabled=false 
-  --set dags.persistence.existingClaim="" 
-  --set "extraVolumeMounts[0].name=csi-volume" 
-  --set "extraVolumeMounts[0].mountPath=/opt/airflow/dags" 
-  --set "extraVolumes[0].name=csi-volume" 
-  --set "extraVolumes[0].csi.driver=ephemeral.csi.storage.k8s.io" 
-  --set "extraVolumes[0].csi.volumeAttributes.storageClassName=fast" 
-  --set "extraVolumes[0].csi.volumeAttributes.size=500Gi"
-
-
-  helm upgrade airflow apache-airflow/airflow 
-  --namespace airflow 
-  --create-namespace 
-  --set airflow.image.tag="2.6.2" 
-  --set executor=CeleryExecutor 
-  --set airflow.config.AIRFLOW__CORE__LOAD_EXAMPLES=false 
-  --set redis.enabled=true 
-  --set postgresql.enabled=true 
-  --set airflow.ingress.enabled=true 
-  --set webserver.service.type=ClusterIP 
-  --set dags.persistence.enabled=false 
-  --set "airflow.extraEnv[0].name"=AIRFLOW__CORE__REMOTE_LOGGING 
-  --set "airflow.extraEnv[0].value"=true 
-  --set "airflow.extraEnv[1].name"=AIRFLOW__CORE__REMOTE_BASE_LOG_FOLDER 
-  --set "airflow.extraEnv[1].value"=gs://phuongnv63/logs 
-  --set "airflow.extraEnv[2].name"=AIRFLOW__CORE__DAGS_FOLDER 
-  --set "airflow.extraEnv[2].value"=gs://phuongnv63/dags 
-  --set "airflow.extraEnv[3].name"=GOOGLE_APPLICATION_CREDENTIALS 
-  --set "airflow.extraEnv[3].value"="/opt/airflow/key.json" 
-  --set "airflow.extraVolumes[0].name"=gcs-storage-secret 
-  --set "airflow.extraVolumes[0].secret.secretName"=gcs-storage-secret 
-  --set "airflow.extraVolumeMounts[0].name"=gcs-storage-secret 
-  --set "airflow.extraVolumeMounts[0].mountPath"=/opt/airflow/key.json 
-  --set "airflow.extraVolumeMounts[0].subPath"=key.json
-
-
-helm install airflow apache-airflow/airflow 
-  --namespace airflow 
-  --create-namespace 
-  --set "airflow.extraEnv[0].name"=GOOGLE_APPLICATION_CREDENTIALS 
-  --set "airflow.extraEnv[0].value"=/opt/airflow/key.json 
-  --set "airflow.extraVolumes[0].name"=gcs-storage-secret 
-  --set "airflow.extraVolumes[0].secret.secretName"=gcs-storage-secret 
-  --set "airflow.extraVolumeMounts[0].name"=gcs-storage-secret 
-  --set "airflow.extraVolumeMounts[0].mountPath"=/opt/airflow/key.json 
-  --set "airflow.extraVolumeMounts[0].subPath"=key.json
-
-
-
-gcloud iam service-accounts add-iam-policy-binding \
-  storage-admin@gothic-avenue-444923-e9.iam.gserviceaccount.com \
-  --role "roles/iam.workloadIdentityUser" \
-  --member "serviceAccount:gothic-avenue-444923-e9.svc.id.goog[airflow/airflow-dev-scheduler]"
-
-  kubectl get pod airflow-dev-scheduler-6b564b89d9-978r5 -n airflow -o jsonpath='{.spec.serviceAccountName}'
- 
- 
-kubectl describe pod airflow-dev-scheduler-c546c9ccc -n airflow
- 
-gcloud storage buckets add-iam-policy-binding gs://phuongnv63 
-  --member "serviceAccount:storage-admin@gothic-avenue-444923-e9.iam.gserviceaccount.com" 
-  --role "roles/storage.admin"
- 
- 
-kubectl annotate serviceaccount phuongnv63 iam.gke.io/gcp-service-account=storage-admin@gothic-avenue-444923-e9.iam.gserviceaccount.com -n airflow
- 
-kubectl get events -n airflow --sort-by='.lastTimestamp'
- 
-gcloud iam service-accounts add-iam-policy-binding  
-storage-admin@devops-cms-demo-445215.iam.gserviceaccount.com  
---role "roles/iam.workloadIdentityUser"  
---member "serviceAccount:devops-cms-demo-445215.svc.id.goog[airflow/phuongnv63]"
+kubectl cp ./timedelta.py airflow-dev-scheduler-8bbb89b4c-dxvdb:/opt/airflow/dags -n airflow
+kubectl cp ./every_5_minutes_dag.py airflow-dev-scheduler-8bbb89b4c-dxvdb:/opt/airflow/dags -n airflow

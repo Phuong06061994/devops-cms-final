@@ -7,11 +7,12 @@ airflow:
     AIRFLOW__CORE__LOAD_EXAMPLES: false
 
 dags:
-  mountPath: /opt/airflow/dags
-  persistence:
-    enabled: true
-    existingClaim: dags-pvc
-    size: 100Gi
+    mountPath: /opt/airflow/dags
+    persistence:
+      enabled: true
+      existingClaim: logs-pvc
+      size: 100Gi
+
 ingress:
     enabled: true
 
@@ -41,6 +42,7 @@ workers:
       iam.gke.io/gcp-service-account: storage-admin@devops-cms-demo-445215.iam.gserviceaccount.com
 
 scheduler:
+  enabled: true
   replicas: 1
   serviceAccount:
     automountServiceAccountToken: true
@@ -52,20 +54,13 @@ flower:
   enabled: true
 
 triggerer:
+  enabled: true
   replicas: 1
   serviceAccount:
     create: false
     name: phuongnv63
     annotations:
       iam.gke.io/gcp-service-account: storage-admin@devops-cms-demo-445215.iam.gserviceaccount.com
-  
-resources:
-  requests:
-    cpu: "500m"
-    memory: "512Mi"
-  limits:
-    cpu: "1000m"
-    memory: "1024Mi"
 
 logs:
     persistence:
